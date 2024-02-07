@@ -32,7 +32,9 @@ struct MissingPersonDetailedView: View {
 
                     HStack {
                         Text(missingPerson.name).font(.title).bold().opacity(0.8)
-                        Text("\(missingPerson.age)").font(.title).bold().opacity(0.2)
+                        if let age = missingPerson.age {
+                            Text(age).font(.title).bold().opacity(0.2)
+                        }
                     }
 
                     DataBlockStyleView(highlightColor: .orange, fullWidth: true) {
@@ -41,62 +43,70 @@ struct MissingPersonDetailedView: View {
                                 highlightColor: .orange,
                                 icon: Image(systemName: "person.fill"),
                                 supportingTitle: "Kön",
-                                mainTitle: missingPerson.gender.firstLetterCapitalized()
+                                mainTitle: missingPerson.gender?.firstLetterCapitalized() ?? "Okänd"
                             )
                             Spacer()
                             DataBlockView(
                                 highlightColor: .orange,
                                 icon: Image(systemName: "ruler"),
                                 supportingTitle: "Längd",
-                                mainTitle: "\(missingPerson.height) cm"
+                                mainTitle: {
+                                    guard let height = missingPerson.height else { return "Okänd" }
+                                    return "\(height) cm"
+                                }()
                             )
                             Spacer()
                             DataBlockView(
                                 highlightColor: .orange,
                                 icon: Image(systemName: "scalemass.fill"),
                                 supportingTitle: "Vikt",
-                                mainTitle: "\(missingPerson.weight) kg"
+                                mainTitle: {
+                                    guard let weight = missingPerson.weight else { return "Okänd" }
+                                    return "\(weight) kg"
+                                }()
                             )
                         }
                     }
 
-                    HStack {
-                        Rectangle()
-                            .frame(height: 2)
-                            .opacity(0.02)
-                        Text("FÖRSVINNANDET")
-                            .font(.system(size: 10, weight: .semibold))
-                            .opacity(0.2)
-                        Rectangle()
-                            .frame(height: 2)
-                            .opacity(0.02)
+                    if [missingPerson.missingSince, missingPerson.lastSeenAt].contains(where: { $0 != nil }) {
+                        HStack {
+                            Rectangle()
+                                .frame(height: 2)
+                                .opacity(0.02)
+                            Text("FÖRSVINNANDET")
+                                .font(.system(size: 10, weight: .semibold))
+                                .opacity(0.2)
+                            Rectangle()
+                                .frame(height: 2)
+                                .opacity(0.02)
+                        }
                     }
 
                     WrappingHStack(alignment: .leading) {
-                        DataBlockStyleView(highlightColor: .blue, fullWidth: false) {
-                            HStack(spacing: 0) {
-                                DataBlockView(
-                                    highlightColor: .blue,
-                                    icon: Image(systemName: "clock.badge"),
-                                    supportingTitle: "Försvunnen sedan",
-                                    mainTitle: missingPerson.missingSince
-                                )
-                            }
-                        }
-
-                        Button(action: { 
-                            if !missingPerson.lastSeenAt.isEmpty {
-                                openMapsForCity(cityName: missingPerson.lastSeenAt.firstLetterCapitalized())
-                            }
-                        }) {
+                        if let missingSince = missingPerson.missingSince {
                             DataBlockStyleView(highlightColor: .blue, fullWidth: false) {
                                 HStack(spacing: 0) {
                                     DataBlockView(
                                         highlightColor: .blue,
-                                        icon: Image(systemName: "building.2.crop.circle"),
-                                        supportingTitle: "Sågs senast i",
-                                        mainTitle: missingPerson.lastSeenAt.firstLetterCapitalized()
+                                        icon: Image(systemName: "clock.badge"),
+                                        supportingTitle: "Försvunnen sedan",
+                                        mainTitle: missingSince
                                     )
+                                }
+                            }
+                        }
+
+                        if let lastSeenAt = missingPerson.lastSeenAt {
+                            Button(action: { openMapsForCity(cityName: lastSeenAt) }) {
+                                DataBlockStyleView(highlightColor: .blue, fullWidth: false) {
+                                    HStack(spacing: 0) {
+                                        DataBlockView(
+                                            highlightColor: .blue,
+                                            icon: Image(systemName: "building.2.crop.circle"),
+                                            supportingTitle: "Sågs senast i",
+                                            mainTitle: lastSeenAt
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -115,7 +125,10 @@ struct MissingPersonDetailedView: View {
                             .fill(Color("SemiBackground"))
                     }
 
-                    if !missingPerson.transportName.isEmpty {
+                    if [missingPerson.transportName, 
+                        missingPerson.transportColor,
+                        missingPerson.transportRegistrationNumber
+                    ].contains(where: { $0 != nil }) {
                         HStack {
                             Rectangle()
                                 .frame(height: 2)
@@ -127,50 +140,53 @@ struct MissingPersonDetailedView: View {
                                 .frame(height: 2)
                                 .opacity(0.02)
                         }
+                    }
 
-                        WrappingHStack(alignment: .leading) {
-                            if !missingPerson.transportName.isEmpty {
-                                DataBlockStyleView(highlightColor: .none, fullWidth: false) {
-                                    HStack(spacing: 0) {
-                                        DataBlockView(
-                                            highlightColor: .orange,
-                                            icon: Image(systemName: "train.side.front.car"),
-                                            supportingTitle: "Transport",
-                                            mainTitle: missingPerson.transportName
-                                        )
-                                    }
+                    WrappingHStack(alignment: .leading) {
+                        if let transportName = missingPerson.transportName {
+                            DataBlockStyleView(highlightColor: .none, fullWidth: false) {
+                                HStack(spacing: 0) {
+                                    DataBlockView(
+                                        highlightColor: .orange,
+                                        icon: Image(systemName: "train.side.front.car"),
+                                        supportingTitle: "Transport",
+                                        mainTitle: transportName.firstLetterCapitalized()
+                                    )
                                 }
                             }
+                        }
 
-                            if !missingPerson.transportColor.isEmpty {
-                                DataBlockStyleView(highlightColor: .none, fullWidth: false) {
-                                    HStack(spacing: 0) {
-                                        DataBlockView(
-                                            highlightColor: .orange,
-                                            icon: Image(systemName: "paintpalette.fill"),
-                                            supportingTitle: "Färg",
-                                            mainTitle: missingPerson.transportColor
-                                        )
-                                    }
+                        if let transportColor = missingPerson.transportColor {
+                            DataBlockStyleView(highlightColor: .none, fullWidth: false) {
+                                HStack(spacing: 0) {
+                                    DataBlockView(
+                                        highlightColor: .orange,
+                                        icon: Image(systemName: "paintpalette.fill"),
+                                        supportingTitle: "Färg",
+                                        mainTitle: transportColor.firstLetterCapitalized()
+                                    )
                                 }
                             }
+                        }
 
-                            if !missingPerson.transportRegistrationNumber.isEmpty {
-                                DataBlockStyleView(highlightColor: .none, fullWidth: false) {
-                                    HStack(spacing: 0) {
-                                        DataBlockView(
-                                            highlightColor: .orange,
-                                            icon: Image(systemName: "123.rectangle.fill"),
-                                            supportingTitle: "Reg. Nummer",
-                                            mainTitle: missingPerson.transportRegistrationNumber
-                                        )
-                                    }
+                        if let transportRegistrationNumber = missingPerson.transportRegistrationNumber {
+                            DataBlockStyleView(highlightColor: .none, fullWidth: false) {
+                                HStack(spacing: 0) {
+                                    DataBlockView(
+                                        highlightColor: .orange,
+                                        icon: Image(systemName: "123.rectangle.fill"),
+                                        supportingTitle: "Reg. Nummer",
+                                        mainTitle: transportRegistrationNumber
+                                    )
                                 }
                             }
                         }
                     }
 
-                    if !missingPerson.hairAppearance.isEmpty {
+                    if [missingPerson.hairAppearance,
+                        missingPerson.hasBeard,
+                        missingPerson.clothingAppearance
+                    ].contains(where: { $0 != nil }) {
                         HStack {
                             Rectangle()
                                 .frame(height: 2)
@@ -182,44 +198,44 @@ struct MissingPersonDetailedView: View {
                                 .frame(height: 2)
                                 .opacity(0.02)
                         }
+                    }
 
-                        WrappingHStack(alignment: .leading) {
-                            if !missingPerson.hairAppearance.isEmpty {
-                                DataBlockStyleView(highlightColor: .none, fullWidth: false) {
-                                    HStack(spacing: 0) {
-                                        DataBlockView(
-                                            highlightColor: .orange,
-                                            icon: Image(systemName: "comb.fill"),
-                                            supportingTitle: "Håret",
-                                            mainTitle: missingPerson.hairAppearance.firstLetterCapitalized()
-                                        )
-                                    }
+                    WrappingHStack(alignment: .leading) {
+                        if let hairAppearance = missingPerson.hairAppearance {
+                            DataBlockStyleView(highlightColor: .none, fullWidth: false) {
+                                HStack(spacing: 0) {
+                                    DataBlockView(
+                                        highlightColor: .orange,
+                                        icon: Image(systemName: "comb.fill"),
+                                        supportingTitle: "Håret",
+                                        mainTitle: hairAppearance.firstLetterCapitalized()
+                                    )
                                 }
                             }
+                        }
 
-                            if !missingPerson.hasBeard.isEmpty {
-                                DataBlockStyleView(highlightColor: .none, fullWidth: false) {
-                                    HStack(spacing: 0) {
-                                        DataBlockView(
-                                            highlightColor: .orange,
-                                            icon: Image(systemName: "scissors"),
-                                            supportingTitle: "Skägg",
-                                            mainTitle: missingPerson.hasBeard
-                                        )
-                                    }
+                        if let hasBeard = missingPerson.hasBeard {
+                            DataBlockStyleView(highlightColor: .none, fullWidth: false) {
+                                HStack(spacing: 0) {
+                                    DataBlockView(
+                                        highlightColor: .orange,
+                                        icon: Image(systemName: "scissors"),
+                                        supportingTitle: "Skägg",
+                                        mainTitle: hasBeard.firstLetterCapitalized()
+                                    )
                                 }
                             }
+                        }
 
-                            if !missingPerson.clothingAppearance.isEmpty {
-                                DataBlockStyleView(highlightColor: .none, fullWidth: false) {
-                                    HStack(spacing: 0) {
-                                        DataBlockView(
-                                            highlightColor: .orange,
-                                            icon: Image(systemName: "tshirt.fill"),
-                                            supportingTitle: "Klädsel",
-                                            mainTitle: missingPerson.clothingAppearance.firstLetterCapitalized()
-                                        )
-                                    }
+                        if let clothingAppearance = missingPerson.clothingAppearance {
+                            DataBlockStyleView(highlightColor: .none, fullWidth: false) {
+                                HStack(spacing: 0) {
+                                    DataBlockView(
+                                        highlightColor: .orange,
+                                        icon: Image(systemName: "tshirt.fill"),
+                                        supportingTitle: "Klädsel",
+                                        mainTitle: clothingAppearance.firstLetterCapitalized()
+                                    )
                                 }
                             }
                         }

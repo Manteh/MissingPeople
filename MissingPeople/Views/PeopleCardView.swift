@@ -16,9 +16,17 @@ struct PeopleCardView: View {
         Button(action: { self.shouldNavToDetailedView = true }) {
             HStack(alignment: .top, spacing: 20) {
                 VStack(alignment: .leading, spacing: 20) {
-                    Text("\(missingPerson.name) \(missingPerson.age)")
-                        .font(.title2)
-                        .bold()
+                    HStack {
+                        Text("\(missingPerson.name)")
+                            .font(.title2)
+                            .bold()
+                        if let age = missingPerson.age {
+                            Text(age)
+                                .font(.title2)
+                                .bold()
+                                .opacity(0.2)
+                        }
+                    }
                     CardDetailsView(missingPerson: missingPerson)
                 }
                 Spacer()
@@ -66,7 +74,7 @@ struct CardDetailsView: View {
                     }
                 VStack(alignment: .leading) {
                     Text("Försvunnen sedan").opacity(0.2)
-                    Text(missingPerson.missingSince).opacity(0.5)
+                    Text(missingPerson.missingSince ?? "-").opacity(0.5)
                 }
                 .font(.footnote)
             }
@@ -80,7 +88,7 @@ struct CardDetailsView: View {
                     }
                 VStack(alignment: .leading) {
                     Text("Sågs senast i").opacity(0.2)
-                    Text(missingPerson.lastSeenAt).opacity(0.5)
+                    Text(missingPerson.lastSeenAt ?? "-").opacity(0.5)
                 }
                 .font(.footnote)
             }
