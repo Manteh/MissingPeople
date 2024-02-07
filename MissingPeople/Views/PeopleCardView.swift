@@ -15,6 +15,13 @@ struct PeopleCardView: View {
     var body: some View {
         Button(action: { self.shouldNavToDetailedView = true }) {
             HStack(alignment: .top, spacing: 20) {
+                VStack(alignment: .leading, spacing: 20) {
+                    Text("\(missingPerson.name) \(missingPerson.age)")
+                        .font(.title2)
+                        .bold()
+                    CardDetailsView(missingPerson: missingPerson)
+                }
+                Spacer()
                 AsyncImage(url: URL(string: missingPerson.imageURL)) { phase in
                     if let image = phase.image {
                         image
@@ -28,12 +35,6 @@ struct PeopleCardView: View {
                         ProgressView()
                             .frame(width: 90, height: 90)
                     }
-                }
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("\(missingPerson.name) \(missingPerson.age)")
-                        .font(.title2)
-                        .bold()
-                    CardDetailsView(missingPerson: missingPerson)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
