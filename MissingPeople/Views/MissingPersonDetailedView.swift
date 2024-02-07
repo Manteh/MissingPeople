@@ -84,7 +84,11 @@ struct MissingPersonDetailedView: View {
                             }
                         }
 
-                        Button(action: { openMapsForCity(cityName: missingPerson.lastSeenAt.firstLetterCapitalized()) }) {
+                        Button(action: { 
+                            if !missingPerson.lastSeenAt.isEmpty {
+                                openMapsForCity(cityName: missingPerson.lastSeenAt.firstLetterCapitalized())
+                            }
+                        }) {
                             DataBlockStyleView(highlightColor: .blue, fullWidth: false) {
                                 HStack(spacing: 0) {
                                     DataBlockView(
