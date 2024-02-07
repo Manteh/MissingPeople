@@ -14,7 +14,7 @@ struct PeopleTabView: View {
         NavigationStack {
             ZStack {
                 Color("Background").edgesIgnoringSafeArea(.all)
-                List(missingPeople) { missingPerson in
+                List(missingPeople, id: \.id) { missingPerson in
                     PeopleCardView(missingPerson: missingPerson)
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
