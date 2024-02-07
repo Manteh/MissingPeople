@@ -17,13 +17,5 @@
 ## Contributing
 Contributions are welcome! If you find bugs or have suggestions for improvements, please open an issue or submit a pull request.
 
-## Author
-**Mantas Simanauskas** - [GitHub Profile](https://github.com/Manteh)
-
 ## License
 This project is licensed under the [MIT License](LICENSE).
-
-## Acknowledgments
-Special thanks to the SwiftUI and iOS development community for inspiration and support.
-
-Explore the **MissingPeople** app, help make a difference, and bring attention to those who are missing.
