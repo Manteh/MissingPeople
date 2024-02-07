@@ -38,6 +38,7 @@ struct DataBlockView: View {
             Text(mainTitle)
                 .font(.system(size: 14, weight: .semibold))
                 .opacity(0.8)
+                .multilineTextAlignment(.leading)
         }
     }
 }
