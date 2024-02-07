@@ -20,6 +20,12 @@ struct PeopleTabView: View {
                         .listRowSeparator(.hidden)
                 }
                 .listStyle(.plain)
+                .refreshable {
+                    MPService.shared.fetchMissingPeople { missingPeople in
+                        guard let missingPeople = missingPeople else { return }
+                        self.missingPeople = missingPeople
+                    }
+                }
             }
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("Missing People")
