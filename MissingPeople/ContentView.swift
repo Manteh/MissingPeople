@@ -26,12 +26,12 @@ struct ContentView: View {
                         .font(.system(size: 10, weight: .medium))
                 }
 
-            SearchTabView()
-                .tabItem {
-                    Image(systemName: "magnifyingglass")
-                    Text("Search")
-                        .font(.system(size: 10, weight: .medium))
-                }
+//            SearchTabView()
+//                .tabItem {
+//                    Image(systemName: "magnifyingglass")
+//                    Text("Search")
+//                        .font(.system(size: 10, weight: .medium))
+//                }
 
             SettingsTabView()
                 .tabItem {
