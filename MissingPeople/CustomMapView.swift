@@ -130,22 +130,28 @@ struct CustomMapView: UIViewRepresentable {
     @Binding var annotations: [PersonMapPin]
     var onMapCameraChange: ((MKCoordinateRegion) -> Void)?
     var onAnnotationTap: ((PersonMapPin) -> Void)?
+    var onMapTap: (() -> Void)?
 
     init(
         region: Binding<MKCoordinateRegion>,
         annotations: Binding<[PersonMapPin]>,
         onMapCameraChange: ( (MKCoordinateRegion) -> Void)? = nil,
-        onAnnotationTap: ((PersonMapPin) -> Void)? = nil
+        onAnnotationTap: ((PersonMapPin) -> Void)? = nil,
+        onMapTap: (() -> Void)? = nil
     ) {
         self._region = region
         self._annotations = annotations
         self.onMapCameraChange = onMapCameraChange
         self.onAnnotationTap = onAnnotationTap
+        self.onMapTap = onMapTap
     }
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView(frame: .zero)
+        let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.handleTap(_:)))
+        tapGesture.delegate = context.coordinator
         mapView.delegate = context.coordinator
+        mapView.addGestureRecognizer(tapGesture)
         mapView.showsUserLocation = false
         mapView.pointOfInterestFilter = .excludingAll
         mapView.register(PersonAnnotationView.self, forAnnotationViewWithReuseIdentifier: "PersonAnnotationView")
@@ -209,14 +215,25 @@ extension CustomMapView {
             return annotationView
         }
 
-        func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) { }
+        func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
 
-        func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) { }
+        }
+
+        func mapView(_ mapView: MKMapView, regionWillChangeAnimated animated: Bool) { 
+            DispatchQueue.main.async {
+                self.parent.onMapCameraChange?(mapView.region)
+            }
+        }
 
         func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
             DispatchQueue.main.async {
                 self.parent.region = mapView.region
-                self.parent.onMapCameraChange?(mapView.region)
+            }
+        }
+
+        @objc func handleTap(_ gestureRecognizer: UITapGestureRecognizer) {
+            DispatchQueue.main.async {
+                self.parent.onMapTap?()
             }
         }
     }
