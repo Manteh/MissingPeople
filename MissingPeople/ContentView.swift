@@ -19,7 +19,7 @@ struct ContentView: View {
                         .font(.system(size: 10, weight: .medium))
                 }
 
-            MapTabView()
+            MapTabView(missingPeople: $missingPeople)
                 .tabItem {
                     Image(systemName: "map")
                     Text("Map")

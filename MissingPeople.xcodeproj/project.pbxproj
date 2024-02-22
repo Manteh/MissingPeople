@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		585108142B82174700F77E9C /* CustomMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585108132B82174700F77E9C /* CustomMapView.swift */; };
 		585E25222B65B0D900971B6D /* WrappingHStack in Frameworks */ = {isa = PBXBuildFile; productRef = 585E25212B65B0D900971B6D /* WrappingHStack */; };
 		585E25242B65B2D300971B6D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585E25232B65B2D300971B6D /* Extensions.swift */; };
 		585E25282B669AC100971B6D /* PeopleTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585E25272B669AC100971B6D /* PeopleTabView.swift */; };
@@ -54,6 +55,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		585108132B82174700F77E9C /* CustomMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomMapView.swift; sourceTree = "<group>"; };
 		585E25232B65B2D300971B6D /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		585E25272B669AC100971B6D /* PeopleTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleTabView.swift; sourceTree = "<group>"; };
 		585E25292B669ACA00971B6D /* MapTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapTabView.swift; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 				5893F7682B573E53003014A1 /* MissingPeopleApp.swift */,
 				5893F76A2B573E53003014A1 /* ContentView.swift */,
 				585E25232B65B2D300971B6D /* Extensions.swift */,
+				585108132B82174700F77E9C /* CustomMapView.swift */,
 				586101AA2B60232500684E46 /* GoogleService-Info.plist */,
 				5893F76C2B573E55003014A1 /* Assets.xcassets */,
 				5893F76E2B573E55003014A1 /* Preview Content */,
@@ -308,6 +311,7 @@
 				585E25242B65B2D300971B6D /* Extensions.swift in Sources */,
 				585E25312B669F3C00971B6D /* MissingPerson.swift in Sources */,
 				585E25362B66A34B00971B6D /* DataBlockView.swift in Sources */,
+				585108142B82174700F77E9C /* CustomMapView.swift in Sources */,
 				585E252A2B669ACA00971B6D /* MapTabView.swift in Sources */,
 				586101722B60224F00684E46 /* MPService.swift in Sources */,
 				5893F76B2B573E53003014A1 /* ContentView.swift in Sources */,

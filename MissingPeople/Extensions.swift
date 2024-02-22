@@ -5,7 +5,8 @@
 //  Created by Mantas Simanauskas on 2024-01-27.
 //
 
-import Foundation
+import SwiftUI
+import MapKit
 
 extension String {
     func firstLetterCapitalized() -> String {
@@ -23,6 +24,8 @@ extension MissingPerson {
         height: "180",
         imageURL: "https://www.dkpittsburghsports.com/img/random/Najee%20Harris%20close%20up%20-%20Karl%20Roser%20Steelers-1600x900.jpg",
         lastSeenAt: "Stockholm",
+        latitude: "0",
+        longitude: "0",
         missingSince: "2024-01-28",
         name: "Namn",
         transportColor: "Röd",

@@ -23,7 +23,8 @@ struct MissingPersonDetailedView: View {
                                 .scaledToFit()
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                         } else if phase.error != nil {
-                            Color.red // Indicates an error.
+                            ProgressView()
+                                .frame(width: 90, height: 90)
                         } else {
                             ProgressView()
                                 .frame(width: 90, height: 90)
@@ -97,20 +98,19 @@ struct MissingPersonDetailedView: View {
                         }
 
                         if let lastSeenAt = missingPerson.lastSeenAt {
-                            Button(action: { openMapsForCity(cityName: lastSeenAt) }) {
-                                DataBlockStyleView(highlightColor: .blue, fullWidth: false) {
-                                    HStack(spacing: 0) {
-                                        DataBlockView(
-                                            highlightColor: .blue,
-                                            icon: Image(systemName: "building.2.crop.circle"),
-                                            supportingTitle: "Sågs senast i",
-                                            mainTitle: lastSeenAt
-                                        )
-                                    }
+                            DataBlockStyleView(highlightColor: .blue, fullWidth: false) {
+                                HStack(spacing: 0) {
+                                    DataBlockView(
+                                        highlightColor: .blue,
+                                        icon: Image(systemName: "building.2.crop.circle"),
+                                        supportingTitle: "Sågs senast i",
+                                        mainTitle: lastSeenAt
+                                    )
                                 }
                             }
                         }
                     }
+
 
                     HStack {
                         Text("Om du stöter på denna person som är försvunnen, ber vi dig att omedelbart informera dina lokala myndigheter.")
@@ -123,7 +123,23 @@ struct MissingPersonDetailedView: View {
                     .background {
                         RoundedRectangle(cornerRadius: 10)
                             .fill(Color("SemiBackground"))
+                    }   
+                    Button(action: { }) {
+                        HStack(alignment: .center, spacing: 15) {
+                            Text("Rapportera en observering")
+                                .font(.system(size: 14, weight: .regular))
+                                .bold()
+                                .foregroundStyle(Color.blue)
+                        }
+                        .frame(height: 60)
+                        .frame(maxWidth: .infinity)
+                        .opacity(0.8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.blue.opacity(0.05))
+                        )
                     }
+                    .buttonStyle(.plain)
 
                     if [missingPerson.transportName, 
                         missingPerson.transportColor,
