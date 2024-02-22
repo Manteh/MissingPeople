@@ -24,76 +24,13 @@ class PersonMapPin: NSObject, Identifiable, MKAnnotation {
     }
 }
 
-struct PersonMapPinView: View {
-
-    @Binding var mapPin: PersonMapPin
-    @Binding var selectedPerson: MissingPerson?
-    @Binding var currentCameraPosition: MapCameraPosition
-    @Binding var lastCameraPosition: MapCameraPosition?
-    @Binding var viewRegion: MKCoordinateRegion
-
-    var body: some View {
-        VStack {
-            AsyncImage(url: URL(string: mapPin.missingPerson.imageURL)) { phase in
-                if let image = phase.image {
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(
-                            width: selectedPerson == mapPin.missingPerson ? 60 : (mapPin.isVisible ? 30 : 10),
-                            height: selectedPerson == mapPin.missingPerson ? 60 : (mapPin.isVisible ? 30 : 10),
-                            alignment: .center
-                        )
-                        .clipShape(selectedPerson == mapPin.missingPerson ? RoundedRectangle(cornerRadius: 10) : RoundedRectangle(cornerRadius: 30))
-                        .overlay(RoundedRectangle(cornerRadius: selectedPerson == mapPin.missingPerson ? 10 : 30).stroke(Color.white, lineWidth: selectedPerson == mapPin.missingPerson ? 4 : 2))
-                }
-            }
-
-            Text(mapPin.missingPerson.name)
-                .font(.caption)
-                .frame(maxWidth: .infinity)
-                .padding(5)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 15))
-                .opacity(selectedPerson == mapPin.missingPerson ? 1 : 0)
-        }
-        .animation(.linear, value: self.selectedPerson)
-        .animation(.linear, value: mapPin.isVisible)
-        .onChange(of: lastCameraPosition) {
-            DispatchQueue.main.async {
-                if mapPin.isVisible != isCoordinateVisible(mapPin.coordinate) {
-                    self.mapPin.isVisible = isCoordinateVisible(mapPin.coordinate)
-                }
-            }
-        }
-        .onTapGesture {
-            DispatchQueue.main.async {
-                let newCameraPosition = MapCameraPosition.region(MKCoordinateRegion(
-                    center: mapPin.coordinate,
-                    span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2)
-                ))
-                withAnimation(.spring) {
-                    self.selectedPerson = mapPin.missingPerson
-                }
-
-                withAnimation(.spring) {
-                    self.currentCameraPosition = newCameraPosition
-                }
-            }
-        }
-    }
-
-    func isCoordinateVisible(_ coordinate: CLLocationCoordinate2D) -> Bool {
-        return viewRegion.contains(coordinate)
-    }
-}
-
 struct MapTabView: View {
     @Binding var missingPeople: [MissingPerson]
 
     @State private var locations: [Location] = []
     @State private var selectedTag: Int?
-    @State private var selectedPerson: MissingPerson?
-    @State private var showDetails = false
+    @State private var selectedPerson: MissingPerson? = nil
+    @State private var isSheetPresented = false
 
     static let initialCameraPosition = MapCameraPosition.region(MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 62.0, longitude: 15.0),
@@ -113,31 +50,21 @@ struct MapTabView: View {
                 Color("Background").edgesIgnoringSafeArea(.all)
                 if !mapPins.isEmpty {
                     CustomMapView(region: $viewRegion, annotations: $mapPins, onAnnotationTap: { annotation in
-                        print("Annotation: \(annotation.missingPerson.name)")
-                        self.selectedPerson = annotation.missingPerson
-                    })
+                        DispatchQueue.main.async {
+                            self.selectedPerson = annotation.missingPerson
+                            if let selectedPerson = self.selectedPerson {
+                                self.isSheetPresented = true
+                            }
+                        }
+                    }, onMapTap: { self.isSheetPresented = false })
                     .edgesIgnoringSafeArea(.top)
                 } else {
                     ProgressView()
                 }
             }
             .toolbar(.hidden)
-            .sheet(item: self.$selectedPerson, onDismiss: {
-                DispatchQueue.main.async {
-                    if let lastCameraPosition = lastCameraPosition {
-                        withAnimation {
-                            self.currentCameraPosition = lastCameraPosition
-                        }
-                    }
-                    self.selectedPerson = nil
-                }
-            }) { selectedPerson in
-                SummarySheetView(
-                    selectedPerson: Binding(
-                        get: { selectedPerson },
-                        set: { self.selectedPerson = $0 }
-                    )
-                )
+            .sheet(isPresented: $isSheetPresented) {
+                SummarySheetView(selectedPerson: $selectedPerson, isParentPresented: $isSheetPresented)
             }
             .onAppear {
                 if mapPins.isEmpty {
@@ -160,6 +87,7 @@ struct MapTabView: View {
 
 struct SummarySheetView: View {
     @Binding var selectedPerson: MissingPerson?
+    @Binding var isParentPresented: Bool
     @State var showDetails = false
     var body: some View {
         ZStack {
@@ -178,22 +106,23 @@ struct SummarySheetView: View {
                             .overlay(
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(Color.white, lineWidth: 2)
+                                    .opacity(0.8)
                             )
 
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 5) {
                             Text("\(selectedPerson.name.firstLetterCapitalized())")
                                 .font(.title)
                                 .bold()
-                                .padding(.bottom, 5)
+                                .opacity(0.8)
 
                             if let lastSeenAt = selectedPerson.lastSeenAt { 
                                 Text(lastSeenAt)
-                                    .font(.footnote)
+                                    .font(.system(size: 14, weight: .semibold))
                                     .opacity(0.2)
                             }
                             if let missingSince = selectedPerson.missingSince { 
                                 Text(missingSince)
-                                    .font(.footnote)
+                                    .font(.system(size: 14, weight: .semibold))
                                     .opacity(0.2)
                             }
                         }
@@ -204,8 +133,10 @@ struct SummarySheetView: View {
                 Spacer()
 
                 Button(action: {
-                    DispatchQueue.main.async {
-                        self.showDetails = true
+                    if let _ = selectedPerson {
+                        DispatchQueue.main.async {
+                            self.showDetails = true
+                        }
                     }
                 }) {
                     HStack(alignment: .center, spacing: 15) {
@@ -224,17 +155,20 @@ struct SummarySheetView: View {
             }
             .padding(.horizontal, 20)
             .padding(.top, 25)
-            .sheet(isPresented: $showDetails, onDismiss: { self.selectedPerson = nil }) {
+            .sheet(isPresented: $showDetails) {
                 ZStack {
-                    Color("Background").edgesIgnoringSafeArea(.all)
-                    if let missingPerson = selectedPerson {
-                        MissingPersonDetailedView(missingPerson: missingPerson)
+                    if let selectedPerson = selectedPerson {
+                        Color("Background").edgesIgnoringSafeArea(.all)
+                        MissingPersonDetailedView(missingPerson: selectedPerson)
+                    } else {
+                        ProgressView().onAppear { self.showDetails = false }
                     }
                 }
                 .presentationDetents([.large])
             }
         }
         .presentationDetents([.small])
+        .presentationBackgroundInteraction(.enabled(upThrough: .small))
     }
 }
 
