@@ -89,6 +89,7 @@ struct SummarySheetView: View {
     @Binding var selectedPerson: MissingPerson?
     @Binding var isParentPresented: Bool
     @State var showDetails = false
+    @State var animations = [false, false, false]
     var body: some View {
         ZStack {
             Color("Background").edgesIgnoringSafeArea(.all)
@@ -113,19 +114,39 @@ struct SummarySheetView: View {
                             Text("\(selectedPerson.name.firstLetterCapitalized())")
                                 .font(.title)
                                 .bold()
-                                .opacity(0.8)
+                                .offset(x: self.animations[0] ? 0 : 20)
+                                .opacity(self.animations[0] ? 0.8 : 0)
 
                             if let lastSeenAt = selectedPerson.lastSeenAt { 
                                 Text(lastSeenAt)
                                     .font(.system(size: 14, weight: .semibold))
-                                    .opacity(0.2)
+                                    .offset(y: self.animations[1] ? 0 : 20)
+                                    .opacity(self.animations[1] ? 0.2 : 0)
                             }
                             if let missingSince = selectedPerson.missingSince { 
                                 Text(missingSince)
                                     .font(.system(size: 14, weight: .semibold))
-                                    .opacity(0.2)
+                                    .offset(y: self.animations[2] ? 0 : 20)
+                                    .opacity(self.animations[2] ? 0.2 : 0)
                             }
                         }
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                withAnimation(.spring) {
+                                    self.animations[0] = true
+                                }
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    withAnimation(.spring) {
+                                        self.animations[1] = true
+                                    }
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        withAnimation(.spring) {
+                                            self.animations[2] = true
+                                        }
+                                    }
+                                }
+                            }
+                        }   
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
