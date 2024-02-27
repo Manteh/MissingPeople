@@ -66,6 +66,16 @@ struct MapTabView: View {
             .sheet(isPresented: $isSheetPresented) {
                 SummarySheetView(selectedPerson: $selectedPerson, isParentPresented: $isSheetPresented)
             }
+            .onChange(of: missingPeople) {
+                self.mapPins.removeAll()
+                missingPeople.forEach { person in
+                    guard let locationName = person.lastSeenAt else { return }
+                    MPService.shared.getLocationByName(name: locationName) { location in
+                        guard let location = location else { return }
+                        mapPins.append(.init(missingPerson: person, coordinate: location.coordinate))
+                    }
+                }
+            }
             .onAppear {
                 if mapPins.isEmpty {
                     missingPeople.forEach { person in
@@ -146,7 +156,7 @@ struct SummarySheetView: View {
                                     }
                                 }
                             }
-                        }   
+                        }
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
