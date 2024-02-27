@@ -55,7 +55,7 @@ class MPService {
             } else {
                 // If not found in the database, use CLGeocoder to retrieve coordinates
                 let geocoder = CLGeocoder()
-                geocoder.geocodeAddressString(name) { (placemarks, error) in
+                geocoder.geocodeAddressString("\(name), Sweden") { (placemarks, error) in
                     guard let placemark = placemarks?.first,
                           let location = placemark.location else {
                         completion(nil)
