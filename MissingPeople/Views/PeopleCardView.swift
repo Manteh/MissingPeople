@@ -11,6 +11,7 @@ struct PeopleCardView: View {
     let missingPerson: MissingPerson
 
     @State private var shouldNavToDetailedView = false
+    @State private var didAppear = false
 
     var body: some View {
         Button(action: { self.shouldNavToDetailedView = true }) {
@@ -37,8 +38,6 @@ struct PeopleCardView: View {
                             .scaledToFill()
                             .frame(width: 100, height: 160)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
-                    } else if phase.error != nil {
-                        Color.red // Indicates an error.
                     } else {
                         ProgressView()
                             .frame(width: 90, height: 90)
@@ -52,9 +51,25 @@ struct PeopleCardView: View {
                     .fill(LinearGradient(colors: [Color.white.opacity(0.03), Color.white.opacity(0)], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .stroke(.white.opacity(0.02), lineWidth: 2)
             )
+            .opacity(didAppear ? 1 : 0)
+            .offset(x: didAppear ? 0 : 50)
         }
         .navigationDestination(isPresented: $shouldNavToDetailedView) {
             MissingPersonDetailedView(missingPerson: missingPerson)
+        }
+        .onDisappear {
+            DispatchQueue.main.async {
+                withAnimation(.spring(duration: 0.5)) {
+                    self.didAppear = false
+                }
+            }
+        }
+        .onAppear {
+            DispatchQueue.main.async {
+                withAnimation(.spring(duration: 0.5)) {
+                    self.didAppear = true
+                }
+            }
         }
     }
 }
