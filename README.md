@@ -19,3 +19,10 @@ Contributions are welcome! If you find bugs or have suggestions for improvements
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
+
+## Preview
+
+
+https://github.com/user-attachments/assets/7a4e7a59-a19a-435b-b34a-9fef1bfc177c
+
+
